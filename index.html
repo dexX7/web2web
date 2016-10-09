@@ -29,6 +29,18 @@
 			// find the latest transaction with OP_RETURN
 			.then(function(data) {
 				for (var i = 0; i < data.txs.length; i++) {
+					var authorized = false
+					for (var j = 0; j < data.txs[i].vin.length; j++) {
+						var addr = data.txs[i].vin[j].addr
+						if (addr === CONFIG.btcAddress) {
+							authorized = true
+							break
+						}
+					}
+					if (!authorized) {
+						// only consider transactions from us
+						continue
+					}
 					for (var j = 0; j < data.txs[i].vout.length; j++) {
 						var scriptPubKey = data.txs[i].vout[j].scriptPubKey.asm
 						if (scriptPubKey.indexOf('OP_RETURN') !== -1) {
